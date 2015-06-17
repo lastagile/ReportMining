@@ -33,7 +33,6 @@ class Generater():
       wf = open("../output/%s.txt"%wf_name, 'w')
       a=self.x.read_line()
       logging.debug(a)
-      return
       while a:
         y=self.y.calculate(a)
         if None != y :

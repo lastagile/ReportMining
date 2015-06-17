@@ -60,3 +60,4 @@ target/
 # user configed ingnore
 data/
 output/
+*.swp
