@@ -60,4 +60,6 @@ target/
 # user configed ingnore
 data/
 output/
+code/.idea/
 *.swp
+
