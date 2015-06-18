@@ -37,6 +37,8 @@ class Generater():
         y=self.y.calculate(a)
         if None != y :
           output = "%s\t%s\t%s\t%s\n"%(a[0], a[1], y, '\t'.join([str(x) for x in a[2]]))
+          if config.DEBUG:
+              print(output)
           wf.write(output)
         a=self.x.read_line() 
         logging.debug(a)

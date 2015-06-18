@@ -22,12 +22,12 @@ class DayDiffY(Y):
       return None
 
     date_time += self.days_interval
-    next_one = self.db.get_next_pirce(symbol, date_time.date())
+    next_one = self.db.get_next(symbol, date_time.date())
 
     if None == next_one:
       logging.error("No next one data")
       return None
-    next_two = self.db.get_next_pirce(symbol, next_one[1] + timedelta(days=1))
+    next_two = self.db.get_next(symbol, next_one[1] + timedelta(days=1))
     if None == next_two:
       logging.error("No next two data")
       return None

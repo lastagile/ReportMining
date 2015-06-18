@@ -10,8 +10,8 @@ class AlphaXPriceHistory(XPriceHistory):
 
   def get_performance(self, current, next_one,criteria):
 
-    index_current = self.db.get_history_pirce("000000",current[1])
-    index_next_one = self.db.get_history_pirce("000000",next_one[1])
+    index_current = self.db.get_history("000000",current[1])
+    index_next_one = self.db.get_history("000000",next_one[1])
 
     if None == index_current or None == index_next_one:
       logging.error("No index data")

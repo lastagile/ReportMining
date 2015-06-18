@@ -31,8 +31,9 @@ CREATE TABLE `stock`.`price` (
 
 INSERT_HISTORY="INSERT INTO price (Symbol,Date,Open,High,Low,Close,Volume,AdjClose) VALUES('%s','%s',%s,%s,%s,%s,%s,%s)"
 SELECT_HISTORY="SELECT * from price where Symbol='%s' and Date='%s'"
-SELECT_NEXT_ONE="SELECT * from price where Symbol='%s' and Date>='%s' and Volume!=0 Order by Date Limit 0,1"
-SELECT_PRE_ONE="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0 Order by Date DESC Limit 0,1"
+SELECT_NEXT_N="SELECT * from price where Symbol='%s' and Date>='%s' and Volume!=0 Order by Date Limit %s"
+SELECT_PRE_N="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0 Order by Date Limit %s"
+
 
 class DB():
     def __init__(self,host='127.0.0.1',port=3306,user='root',db='stock',passwd=''):
@@ -53,17 +54,25 @@ class DB():
         self.execute(INSERT_HISTORY%(Symbol,Date,Open,High,Low,Close,Volume,AdjClose))
 
 
-    def get_history_pirce(self,symbol,time):
+    def get_history(self,symbol,time):
       self.execute(SELECT_HISTORY%(symbol,time))
       return self.cur.fetchone()
 
-    def get_next_pirce(self,symbol,time):
-      self.execute(SELECT_NEXT_ONE%(symbol,time))
+    def get_next(self,symbol,time):
+      self.execute(SELECT_NEXT_N%(symbol,time,1))
       return self.cur.fetchone()
 
     def get_pre_pirce(self,symbol,time):
-      self.execute(SELECT_PRE_ONE%(symbol,time))
+      self.execute(SELECT_PRE_N%(symbol,time,1))
       return self.cur.fetchone()
+
+    def get_pre_many(self,symbol,time,n):
+      self.execute(SELECT_PRE_N%(symbol,time,n))
+      return self.cur.fetchmany(size=n)
+
+    def get_pre_many(self,symbol,time,n):
+      self.execute(SELECT_NEXT_N%(symbol,time,n))
+      return self.cur.fetchmany(size=n)
 
     def __is_equal(self,a, b, absError=0.0001):
         if (abs(a-b) <= max(abs(a), abs(b))*absError ):
