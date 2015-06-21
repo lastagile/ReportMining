@@ -7,8 +7,8 @@ passwd=''
 MAX_MANY=10000
 
 # file related
-PRICE_FILE="../data/price.0620.yahoo.data"
-SHA_INDEX_FILE="../data/price.SHA000001.data.csv"
+PRICE_FILE="../data/price.0620.yahoo.data.test"
+SHA_INDEX_FILE="../data/2015-06-21 price.SHA000001.data.csv"
 SHE_INDEX_FILE="../data/price.SHE399001.data.csv"
 
 DEBUG=False
@@ -19,6 +19,9 @@ else:
     REPORT_FILE="../data/report.0620.data.nodup"
     SYMBOL_List_FILE="../data/symbolList.1105.data"
 
+
+NET_WORK_RETRY_TIMES = 10
+TOLERATE_DAYS=30
 
 # algos
 read_forward="y"

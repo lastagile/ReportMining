@@ -6,7 +6,7 @@ import time
 import socket
 import urllib2
 from datetime import datetime,timedelta
-
+import config
 import gen_symbol_list
 
 
@@ -33,17 +33,37 @@ def genPricesBySymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'
         symbol = symbol + '.SZ'
     else:
         return []
+    #from 1989.01.01 - 2014.12.31
+    url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv'\
+          %(symbol,date_to.month - 1, date_to.day,date_to.year,date_from.month-1,date_from.day,date_from.year)
+    print url
+    return genPricesBySymbol_helper(url)
+
+
+def genPricesProvideSymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'),date_to=datetime.now().date()):
 
     #from 1989.01.01 - 2014.12.31
     url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv'\
           %(symbol,date_to.month - 1, date_to.day,date_to.year,date_from.month-1,date_from.day,date_from.year)
-
     print url
+    return genPricesBySymbol_helper(url)
+
+def genPricesBySymbol_helper(url):
 
     flagHasTobeTrue = False
+    times = 0
     while not flagHasTobeTrue:
+        if times > config.NET_WORK_RETRY_TIMES:
+            return []
+        times = times + 1
+
         try:
-            text = urllib2.urlopen(url, timeout = 10).read()
+            response = urllib2.urlopen(url, timeout = 10)
+            code = response.getcode()
+            if code != 200:
+                print('code != 200' + 'retry ' + url)
+                continue
+            text = response.read()
             lines = text.split('\n')
 
             flagHasTobeTrue = True

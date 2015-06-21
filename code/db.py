@@ -13,7 +13,7 @@ import re
 import time
 import pymysql
 from getdata.gen_symbol_list import excractSymbolList
-from getdata.crawl_price_in_yahoo import genPricesBySymbol
+from getdata.crawl_price_in_yahoo import genPricesBySymbol,genPricesProvideSymbol
 
 def init_logger():
     level = logging.ERROR
@@ -114,6 +114,7 @@ class DB():
               logging.error(line)
               continue
 
+          logging.error(array)
           self.insert_history(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7])
           if count > 1000:
             self.commit()
@@ -153,7 +154,8 @@ class DB():
             if None == latest[0]:
                 prices = genPricesBySymbol(symbol)
             else:
-                prices = genPricesBySymbol(symbol,latest[0]+timedelta(days=1))
+                # set days - TOLERATE_DAYS so that we can bypass some error case of last time update
+                prices = genPricesBySymbol(symbol,latest[0]-timedelta(days=config.TOLERATE_DAYS))
 
             logging.debug(symbol + ' count:' + str(len(prices)))
             for priceOnDay in prices:
@@ -165,12 +167,33 @@ class DB():
 
             self.commit()
 
+    def update_index_history(self):
+        #for console
+        url_symbol = '000001.SS'
+        symbol = '000000'
+        latest = self.get_latest_date(symbol)
+        if None == latest[0]:
+            prices = genPricesBySymbol(symbol)
+        else:
+            # set days - TOLERATE_DAYS so that we can bypass some error case of last time update
+            prices = genPricesProvideSymbol(url_symbol,latest[0]-timedelta(days=config.TOLERATE_DAYS))
+
+        logging.debug(symbol + ' count:' + str(len(prices)))
+        for priceOnDay in prices:
+            if int(self.get_count(symbol,priceOnDay[0])[0]) > 0:
+                logging.error("duplicate line")
+                logging.error(priceOnDay)
+                continue
+            self.insert_history(symbol,*priceOnDay)
+
+        self.commit()
 
 if __name__ == "__main__":
     init_logger()
     db=DB()
     #db.create_table()
-    db.update_history_from_file()
+    #db.update_history_from_file()
     #db.update_history_index_from_file()
-    #db.update_history()
+    db.update_history()
+    db.update_index_history()
     db.close()

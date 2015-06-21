@@ -169,7 +169,8 @@ class ReportDB():
 
                 logging.debug(fields)
                 this_date = datetime.strptime(fields[0],'%Y-%m-%d').date()
-                if this_date < latest_date:
+                # get more days of report for tolerate
+                if this_date < latest_date - timedelta(days=config.TOLERATE_DAYS):
                     should_be_true = False
                 if not self.filter(fields):
                     continue

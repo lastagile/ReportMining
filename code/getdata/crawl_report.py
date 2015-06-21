@@ -29,6 +29,11 @@ def getFieldsByPage(page):
             req_timeout = 5
             req = urllib2.Request(url,None,req_header)
             resp = urllib2.urlopen(req,None,req_timeout)
+            code = resp.getcode()
+            if code != 200:
+                print('code != 200' + 'retry ' + url)
+                continue
+
             text = resp.read()
 
             #old school
