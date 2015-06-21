@@ -40,6 +40,7 @@ SELECT_NEXT_N="SELECT * from price where Symbol='%s' and Date>='%s' and Volume!=
 SELECT_PRE_N="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0 Order by Date DESC Limit %s"
 HISTORY_COUNT="SELECT count(*) from price where Symbol='%s' and Date='%s'"
 GET_LATEST_DATE="SELECT MAX(Date) from price where Symbol='%s'"
+SELECT_HISTORY_RANGE="SELECT * from price where Symbol='%s' and Date>='%s' and Date<='%s' Order by Date"
 
 class DB():
     conn = pymysql.connect(host=config.host,port=config.port,user=config.user,db=config.db,passwd=config.passwd)
@@ -89,6 +90,10 @@ class DB():
         self.execute(GET_LATEST_DATE%symbol)
         return self.cur.fetchone()
 
+    def get_range(self,symbol,from_day,to_day):
+        self.execute(SELECT_HISTORY_RANGE%(symbol,from_day,to_day))
+        return self.cur.fetchmany(config.MAX_MANY)
+
     def get_count(self,symbol,time):
         self.execute(HISTORY_COUNT%(symbol,time))
         return self.cur.fetchone()
@@ -102,6 +107,18 @@ class DB():
     def close(self):
         self.commit()
         self.cur.close()
+
+    def date_clean(self,symbol,from_day,to_day):
+        values = self.get_range(symbol,from_day,to_day)
+        pre_day=values[0]
+        for next_day in values[1:]:
+            two_day_per = 100*( next_day[7] - pre_day[7] ) / pre_day[7]
+            if(abs(two_day_per) > config.DIRTY_RANGE):
+                logging.error("date_clean Dirty data:\n pre_day %s \n next_day%s "%(pre_day,next_day))
+                return False
+            pre_day = next_day
+
+        return True
 
     def update_history_from_file(self):
       count = 0

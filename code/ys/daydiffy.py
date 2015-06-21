@@ -27,10 +27,6 @@ class DayDiffY(Y):
     if None == next_one:
       logging.error("No next one data")
       return None
-    next_two = self.db.get_next(symbol, next_one[1] + timedelta(days=1))
-    if None == next_two:
-      logging.error("No next two data")
-      return None
 
     # long time no trade
     if(next_one[1] - date_time >
@@ -38,11 +34,8 @@ class DayDiffY(Y):
       logging.error("Too long before trade\nnow %s \n next one%s \n next two %s"%(current,next_one,next_two))
       return None
 
-    # dirty
-    two_day_per = 100*( next_two[7] - next_one[7] ) / next_one[7]
-    if(two_day_per > 15 or two_day_per < -15):
-      logging.error("Dirty data\nnow %s \n next one%s \n next two %s"%(current,next_one,next_two))
-      return None
+    if self.db.date_clean(symbol,current[1],next_one[1]):
+        return None
 
     return self.get_performance(current,next_one)
 

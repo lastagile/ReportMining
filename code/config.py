@@ -5,6 +5,7 @@ user='root'
 db='stock'
 passwd=''
 MAX_MANY=10000
+DIRTY_RANGE=15
 
 # file related
 PRICE_FILE="../data/price.0620.yahoo.data.test"

@@ -19,6 +19,9 @@ class AlphaDayDiffY(DayDiffY):
       logging.error("No index data")
       return None
 
+    if self.db.date_clean("000000",index_current[1],index_next_one[1]):
+        return None
+
     a = 100*(next_one[7] - current[7])//current[7] - 100*(index_next_one[7] - index_current[7])//index_current[7]
 
     for i in range(0,len(self.criteria)):
