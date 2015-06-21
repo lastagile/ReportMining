@@ -18,8 +18,8 @@ class Y(object):
   ## Abstract methods 
   def calculate(self,vlist):
     """
-    calculate vlist=['date','symbol',[]]
-    return vlist=['date','symbol',performance,[]]
+    calculate vlist=['symbol','date',[]]
+    return vlist=performance
     """
     pass
 

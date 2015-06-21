@@ -14,12 +14,12 @@ class X1(XBase):
     for i in self.cfg.readlines():
       i = i.rstrip()
       if i:
-        print "i%s"%i
+        print "%s"%i
         formater= self.get_formater(i.split(" ")[0])
         formater.init(i)
         self.x_formater_list.append(formater)
       else:
-         self.x_formater_list.append(X1Formater())
+         self.x_formater_list.append(None)
 
   def get_formater(self, name):
     exec('import x1f' + name.lower())
@@ -34,24 +34,23 @@ class X1(XBase):
     else:
       return True
 
-  def format(self,line):
+  def format(self,str_list):
     """
     format return list[x1,x2,x3...]
     """
     xlist=[]
-    strs = re.split(r'\t', line)
-    if(not self.filter(strs)):
+    if(not self.filter(str_list)):
       return None
 
-    logging.debug(strs)
+    logging.debug(str_list)
     i=0
-    for s in strs[2:]:
-      ls = self.x_formater_list[i].format(s)
-      logging.debug(ls)
-      if None == ls:
-        return None
-      else: 
-        xlist.extend(ls)
+    for s in str_list[2:]:
+      if self.x_formater_list[i] != None:
+          ls = self.x_formater_list[i].format(s)
+          logging.debug(ls)
+          if None == ls:
+            return None
+          else:
+            xlist.extend(ls)
       i = i + 1;
     return xlist
-

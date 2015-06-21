@@ -9,6 +9,7 @@ import inspect
 import ys
 import xs
 from generater import Generater
+import config
 
 class GenerateCLI:
     def __init__(self):
@@ -67,11 +68,14 @@ class GenerateCLI:
 
 
     def init_logger(self, args):
-        level = logging.DEBUG
+        level = logging.VERBOSE
+        if config.DEBUG:
+            level = logging.DEBUG
         if args.verbose:
             level = logging.VERBOSE
         if args.debug:
             level = logging.DEBUG
+
         logging.basicConfig(format='%(asctime)s %(filename)s: %(lineno)d: [%(levelname)s] %(message)s',
                             level=level)
 

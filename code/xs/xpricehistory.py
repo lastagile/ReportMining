@@ -10,48 +10,47 @@ class XPriceHistory(XBase):
   def __init__(self):
     super(XPriceHistory, self).__init__()
     self.db=DB()
-    self.days =[]
+    self.days=[]
     self.ranges =[]
     for i in self.cfg.readlines():
       i = i.rstrip()
       if i:
-        print "i%s"%i
+        print "%s"%i
         (day,value) = i.split("=")
         self.days.append(timedelta(days=int(day)))
         self.ranges.append([int(x) for x in value.split(',')])
-
   def filter(self,strs):
     return True
 
-  def format(self,line):
+  def format(self,str_list):
     """
+    str_list symbol date ....
     format return list[x1,x2,x3...]
     """
     rlist=[]
-    vlist = re.split(r'\t', line)
-    if(not self.filter(vlist)):
+    if(not self.filter(str_list)):
       return None
 
-    symbol=vlist[1]
-    date_time=datetime.strptime(vlist[0],'%Y-%m-%d')
-    current = self.db.get_pre_pirce(symbol,date_time.date())
+    symbol=str_list[0]
+    date = str_list[1]
+    current = self.db.get_pre(symbol,date)
     if None == current:
       logging.error("No data")
       return None
 
     i = 0
     for days_interval in self.days:
-      pre_day = date_time - days_interval
-      pre_one = self.db.get_pre_pirce(symbol, pre_day.date())
+      pre_day = date - days_interval
+      pre_one = self.db.get_pre(symbol, pre_day)
 
       if None == pre_one:
         logging.error("No next one data")
         return None
 
       # long time no trade
-      if(date_time.date() - pre_one[1] > 
+      if(date  - pre_one[1] >
           (days_interval*2 if days_interval > timedelta(days=2) else timedelta(days=3))):
-        logging.error("Too long before trade\nnow %s \n pre one%s "%(current,pre_one))
+        logging.error("Too long before trade\nnow %s \n pre one%s " % (current,pre_one))
         return None
 
       perfor = self.get_performance(pre_one,current,self.ranges[i])

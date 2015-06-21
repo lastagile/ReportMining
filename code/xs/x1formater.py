@@ -10,5 +10,3 @@ class X1Formater():
     format return list[x1,x2,x3...]
     """
     return []
-
-

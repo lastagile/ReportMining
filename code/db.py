@@ -12,8 +12,13 @@ from datetime import datetime,timedelta
 import re
 import time
 import pymysql
+from getdata.gen_symbol_list import excractSymbolList
+from getdata.crawl_price_in_yahoo import genPricesBySymbol
 
-def init_logger(level = logging.INFO):
+def init_logger():
+    level = logging.ERROR
+    if config.DEBUG:
+        level = logging.DEBUG
     logging.basicConfig(format='%(asctime)s %(filename)s: %(lineno)d: [%(levelname)s] %(message)s', level=level)
 
 CREATE_TABLE="""
@@ -32,17 +37,23 @@ CREATE TABLE `stock`.`price` (
 INSERT_HISTORY="INSERT INTO price (Symbol,Date,Open,High,Low,Close,Volume,AdjClose) VALUES('%s','%s',%s,%s,%s,%s,%s,%s)"
 SELECT_HISTORY="SELECT * from price where Symbol='%s' and Date='%s'"
 SELECT_NEXT_N="SELECT * from price where Symbol='%s' and Date>='%s' and Volume!=0 Order by Date Limit %s"
-SELECT_PRE_N="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0 Order by Date Limit %s"
-
+SELECT_PRE_N="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0 Order by Date DESC Limit %s"
+HISTORY_COUNT="SELECT count(*) from price where Symbol='%s' and Date='%s'"
+GET_LATEST_DATE="SELECT MAX(Date) from price where Symbol='%s'"
 
 class DB():
-    def __init__(self,host='127.0.0.1',port=3306,user='root',db='stock',passwd=''):
-        self.conn = pymysql.connect(host=host,port=port,user=user,db=db,passwd=passwd)
+    conn = pymysql.connect(host=config.host,port=config.port,user=config.user,db=config.db,passwd=config.passwd)
+    print("call when DB init")
+
+    def __init__(self,):
         self.cur=self.conn.cursor()
    
     def execute(self,s):
         logging.debug(s)
         self.cur.execute(s)
+
+    def fetchone(self):
+        return self.cur.fetchone()
 
     def commit(self):
         self.conn.commit()
@@ -62,7 +73,7 @@ class DB():
       self.execute(SELECT_NEXT_N%(symbol,time,1))
       return self.cur.fetchone()
 
-    def get_pre_pirce(self,symbol,time):
+    def get_pre(self,symbol,time):
       self.execute(SELECT_PRE_N%(symbol,time,1))
       return self.cur.fetchone()
 
@@ -70,9 +81,17 @@ class DB():
       self.execute(SELECT_PRE_N%(symbol,time,n))
       return self.cur.fetchmany(size=n)
 
-    def get_pre_many(self,symbol,time,n):
+    def get_next_many(self,symbol,time,n):
       self.execute(SELECT_NEXT_N%(symbol,time,n))
       return self.cur.fetchmany(size=n)
+
+    def get_latest_date(self,symbol):
+        self.execute(GET_LATEST_DATE%symbol)
+        return self.cur.fetchone()
+
+    def get_count(self,symbol,time):
+        self.execute(HISTORY_COUNT%(symbol,time))
+        return self.cur.fetchone()
 
     def __is_equal(self,a, b, absError=0.0001):
         if (abs(a-b) <= max(abs(a), abs(b))*absError ):
@@ -83,13 +102,18 @@ class DB():
     def close(self):
         self.commit()
         self.cur.close()
-        self.conn.close()
 
-    def insert_history_all(self):
+    def update_history_from_file(self):
       count = 0
       with open(config.PRICE_FILE, "r") as f:
         for line in f:
           array = line.split()
+          exist_count = int(self.get_count(array[0],array[1])[0])
+          if exist_count > 0:
+              logging.error("duplicate line %s"%count)
+              logging.error(line)
+              continue
+
           self.insert_history(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7])
           if count > 1000:
             self.commit()
@@ -100,11 +124,16 @@ class DB():
 
       self.commit()
 
-    def insert_history_index(self):
+    def update_history_index_from_file(self):
       count = 0
       with open(config.SHA_INDEX_FILE, "r") as f:
         for line in f:
           array = line.split(',')
+          exist_count = int(self.get_count('000000',array[0])[0])
+          if exist_count > 0:
+              logging.error("duplicate line %s"%count)
+              logging.error(line)
+              continue
           self.insert_history('000000',array[0],array[1],array[2],array[3],array[4],array[5],array[6])
           if count > 1000:
             self.commit()
@@ -115,11 +144,33 @@ class DB():
 
       self.commit()
 
+    def update_history(self):
+        #for console
+        symbolListFile = config.SYMBOL_List_FILE
+        symbolList = excractSymbolList(symbolListFile)
+        for symbol in symbolList:
+            latest = self.get_latest_date(symbol)
+            if None == latest[0]:
+                prices = genPricesBySymbol(symbol)
+            else:
+                prices = genPricesBySymbol(symbol,latest[0]+timedelta(days=1))
+
+            logging.debug(symbol + ' count:' + str(len(prices)))
+            for priceOnDay in prices:
+                if int(self.get_count(symbol,priceOnDay[0])[0]) > 0:
+                    logging.error("duplicate line")
+                    logging.error(priceOnDay)
+                    continue
+                self.insert_history(symbol,*priceOnDay)
+
+            self.commit()
+
 
 if __name__ == "__main__":
     init_logger()
     db=DB()
     #db.create_table()
-    #db.insert_history_all()
-    db.insert_history_index()
+    db.update_history_from_file()
+    #db.update_history_index_from_file()
+    #db.update_history()
     db.close()

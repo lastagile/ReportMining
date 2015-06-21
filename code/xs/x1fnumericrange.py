@@ -14,6 +14,8 @@ class X1FNumericRange(X1Formater):
     for i in a:
       self.i_range.append(float(i))
 
+    logging.debug(self.i_range)
+
   def format(self,strs):
     rt=[]
     try:

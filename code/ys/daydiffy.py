@@ -11,18 +11,18 @@ class DayDiffY(Y):
 
   def calculate(self,vlist):
     """
-    calculate vlist=['date','symbol',[]]
+    calculate vlist=['symbol','date',[]]
     return performance
     """
-    symbol=vlist[1]
-    date_time=datetime.strptime(vlist[0],'%Y-%m-%d')
-    current = self.db.get_pre_pirce(symbol,date_time.date())
+    symbol=vlist[0]
+    date_time=vlist[1]
+    current = self.db.get_pre(symbol,date_time)
     if None == current:
       logging.error("No data")
       return None
 
     date_time += self.days_interval
-    next_one = self.db.get_next(symbol, date_time.date())
+    next_one = self.db.get_next(symbol, date_time)
 
     if None == next_one:
       logging.error("No next one data")
@@ -33,7 +33,7 @@ class DayDiffY(Y):
       return None
 
     # long time no trade
-    if(next_one[1] - date_time.date() > 
+    if(next_one[1] - date_time >
           (self.days_interval*2 if self.days_interval > timedelta(days=2) else timedelta(days=3))):
       logging.error("Too long before trade\nnow %s \n next one%s \n next two %s"%(current,next_one,next_two))
       return None

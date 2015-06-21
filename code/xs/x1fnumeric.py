@@ -13,6 +13,7 @@ class X1FNumeric(X1Formater):
     for i in a:
       (n,v) = i.split('=')
       self.s_dict[n] = v
+    logging.debug(self.s_dict)
 
   def format(self,strs):
     if strs in self.s_dict:

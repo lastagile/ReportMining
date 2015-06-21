@@ -8,6 +8,7 @@ class X1FBinary(X1Formater):
 
   def init(self,strs):
     self.s_list = strs.split()[1:]
+    logging.debug(self.s_list)
 
   def format(self,strs):
     rt=[]
