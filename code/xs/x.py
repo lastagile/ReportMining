@@ -19,6 +19,7 @@ class X(object):
         if ( None == line ):
           return None
         else:
+          logging.debug(line)
           a = self.format(line)
           if a:
               return a

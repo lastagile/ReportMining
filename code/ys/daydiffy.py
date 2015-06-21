@@ -31,10 +31,10 @@ class DayDiffY(Y):
     # long time no trade
     if(next_one[1] - date_time >
           (self.days_interval*2 if self.days_interval > timedelta(days=2) else timedelta(days=3))):
-      logging.error("Too long before trade\nnow %s \n next one%s \n next two %s"%(current,next_one,next_two))
+      logging.error("Too long before trade\nnow %s \n next one%s"%(current,next_one))
       return None
 
-    if self.db.date_clean(symbol,current[1],next_one[1]):
+    if not self.db.date_clean(symbol,current[1],next_one[1]):
         return None
 
     return self.get_performance(current,next_one)

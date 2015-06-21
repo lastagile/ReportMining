@@ -26,7 +26,7 @@ socket.setdefaulttimeout(5) #set time out for urlopen
 #error symbol: 002160 and lost of ot:hers
 
 
-def genPricesBySymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'),date_to=datetime.now().date()):
+def genPricesBySymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d').date(),date_to=datetime.now().date()):
     if symbol.startswith('600') or symbol.startswith('601') or symbol.startswith('603'):
         symbol = symbol + '.SS'
     elif symbol.startswith('000') or symbol.startswith('002') or symbol.startswith('300'):

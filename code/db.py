@@ -80,11 +80,11 @@ class DB():
 
     def get_pre_many(self,symbol,time,n):
       self.execute(SELECT_PRE_N%(symbol,time,n))
-      return self.cur.fetchmany(size=n)
+      return self.cur.fetchall()
 
     def get_next_many(self,symbol,time,n):
       self.execute(SELECT_NEXT_N%(symbol,time,n))
-      return self.cur.fetchmany(size=n)
+      return self.cur.fetchall()
 
     def get_latest_date(self,symbol):
         self.execute(GET_LATEST_DATE%symbol)
@@ -92,7 +92,7 @@ class DB():
 
     def get_range(self,symbol,from_day,to_day):
         self.execute(SELECT_HISTORY_RANGE%(symbol,from_day,to_day))
-        return self.cur.fetchmany(config.MAX_MANY)
+        return self.cur.fetchall()
 
     def get_count(self,symbol,time):
         self.execute(HISTORY_COUNT%(symbol,time))

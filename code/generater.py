@@ -25,28 +25,27 @@ class Generater():
       self.y.set_interval(interval)
 
     def run(self):
-      logging.debug("run start...")
-      wf_name = datetime.now().strftime('%Y-%m-%d.%H-%M-%S')
-      call(["rm", "-f", "../output/current.txt"])
-      call(["touch", "../output/%s.txt"%wf_name])
-      call(["ln", "-s", "../output/%s.txt"%wf_name, "../output/current.txt"])
-      wf = open("../output/%s.txt"%wf_name, 'w')
+        logging.debug("run start...")
+        wf_name = datetime.now().strftime('%Y-%m-%d.%H-%M-%S')
+        call(["rm", "-f", "../output/current.txt"])
+        call(["touch", "../output/%s.txt"%wf_name])
+        call(["ln", "-s", "../output/%s.txt"%wf_name, "../output/current.txt"])
+        wf = open("../output/%s.txt"%wf_name, 'w')
 
-      a=self.x.read_line()
-      logging.debug(a)
-      while a:
-        y=self.y.calculate(a)
-        if None != y :
-          output = "%s\t%s\t%s\t%s\n"%(a[1], a[0], y, '\t'.join([str(x) for x in a[2]]))
-          # ['date','symbol',performance,[]]
-          if config.DEBUG:
-              print(output)
-          wf.write(output)
-        a=self.x.read_line() 
+        a=self.x.read_line()
         logging.debug(a)
-        
-      
-      wf.close()
-      logging.debug("run end...")
+        while a:
+            y=self.y.calculate(a)
+            if None != y :
+                output = "%s\t%s\t%s\t%s\n"%(a[1], a[0], y, '\t'.join([str(x) for x in a[2]]))
+                # ['date','symbol',performance,[]]
+                logging.debug(output)
+                wf.write(output)
+
+            a=self.x.read_line()
+            logging.debug(a)
+
+        wf.close()
+        logging.debug("run end...")
 
 

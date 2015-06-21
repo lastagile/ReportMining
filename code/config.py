@@ -4,7 +4,6 @@ port=3306
 user='root'
 db='stock'
 passwd=''
-MAX_MANY=10000
 DIRTY_RANGE=15
 
 # file related

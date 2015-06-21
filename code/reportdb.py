@@ -91,9 +91,9 @@ class ReportDB():
         self.execute(SELECT_HISTORY_RANGE%(symbol,time_from, time_to))
         return self.cur.fetchone()
 
-    def get_many(self,symbol,time_from, time_to,n=config.MAX_MANY):
+    def get_many(self,symbol,time_from, time_to):
         self.execute(SELECT_HISTORY_RANGE%(symbol,time_from, time_to))
-        return self.cur.fetchmany(size=n)
+        return self.cur.fetchall()
 
     def __is_equal(self,a, b, absError=0.0001):
         if (abs(a-b) <= max(abs(a), abs(b))*absError ):
