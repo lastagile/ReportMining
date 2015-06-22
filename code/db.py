@@ -41,6 +41,7 @@ SELECT_PRE_N="SELECT * from price where Symbol='%s' and Date<='%s' and Volume!=0
 HISTORY_COUNT="SELECT count(*) from price where Symbol='%s' and Date='%s'"
 GET_LATEST_DATE="SELECT MAX(Date) from price where Symbol='%s'"
 SELECT_HISTORY_RANGE="SELECT * from price where Symbol='%s' and Date>='%s' and Date<='%s' Order by Date"
+GET_LATEST_DATE_BEFORE="SELECT MAX(Date) from price where Symbol='%s' and Date<='%s'"
 
 class DB():
     conn = pymysql.connect(host=config.host,port=config.port,user=config.user,db=config.db,passwd=config.passwd)
@@ -86,8 +87,8 @@ class DB():
       self.execute(SELECT_NEXT_N%(symbol,time,n))
       return self.cur.fetchall()
 
-    def get_latest_date(self,symbol):
-        self.execute(GET_LATEST_DATE%symbol)
+    def get_latest_date(self,symbol,date=datetime.now().date()):
+        self.execute(GET_LATEST_DATE_BEFORE%(symbol,date))
         return self.cur.fetchone()
 
     def get_range(self,symbol,from_day,to_day):

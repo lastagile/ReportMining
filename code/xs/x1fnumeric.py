@@ -20,4 +20,3 @@ class X1FNumeric(X1Formater):
       return [self.s_dict[strs]]
     else:
       return None
-

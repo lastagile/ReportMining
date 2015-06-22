@@ -26,16 +26,22 @@ class Generater():
 
     def run(self):
         logging.debug("run start...")
+        sub_str=""
+        if config.PREDICT:
+            sub_str = ".pre"
         wf_name = datetime.now().strftime('%Y-%m-%d.%H-%M-%S')
-        call(["rm", "-f", "../output/current.txt"])
-        call(["touch", "../output/%s.txt"%wf_name])
-        call(["ln", "-s", "../output/%s.txt"%wf_name, "../output/current.txt"])
-        wf = open("../output/%s.txt"%wf_name, 'w')
+        call(["rm", "-f", "../output/current%s.txt"%sub_str])
+        call(["touch", "../output/%s%s.txt"%(wf_name,sub_str)])
+        call(["ln", "-s", "../output/%s%s.txt"%(wf_name,sub_str), "../output/current%s.txt"%(sub_str)])
+        wf = open("../output/%s%s.txt"%(wf_name,sub_str), 'w')
 
         a=self.x.read_line()
         logging.debug(a)
         while a:
-            y=self.y.calculate(a)
+            if config.PREDICT:
+                y = -1
+            else:
+                y = self.y.calculate(a)
             if None != y :
                 output = "%s\t%s\t%s\t%s\n"%(a[1], a[0], y, '\t'.join([str(x) for x in a[2]]))
                 # ['date','symbol',performance,[]]

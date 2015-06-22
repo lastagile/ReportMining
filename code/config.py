@@ -1,4 +1,6 @@
 # DB related
+from datetime import datetime,timedelta
+
 host='127.0.0.1'
 port=3306
 user='root'
@@ -21,12 +23,12 @@ else:
 
 # report related
 if DEBUG:
-    FROM_DAY="2015-06-01"
+    from_day = datetime.strptime("2015-06-01",'%Y-%m-%d').date()
 else:
-    FROM_DAY="2014-01-01"
-TO_DAY="2015-12-30"
-
+    from_day = datetime.strptime("2014-01-01",'%Y-%m-%d').date()
+to_day = datetime.now().date()
 READ_FORWARD=True
+
 
 # crawl data related
 NET_WORK_RETRY_TIMES = 10
@@ -42,4 +44,7 @@ alphadaydiffcriteria = [-25,-10,-5,-2,0,2,5,10,25]
 x=["X1","XPriceHistory","XVolumeHistory","XN"]
 #x=["XN"]
 days=7
+
+# if for predict there is no y
+PREDICT=False
 
