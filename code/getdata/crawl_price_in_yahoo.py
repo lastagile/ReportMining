@@ -34,7 +34,7 @@ def genPricesBySymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'
     else:
         return []
     #from 1989.01.01 - 2014.12.31
-    url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv'\
+    url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv' \
           %(symbol,date_to.month - 1, date_to.day,date_to.year,date_from.month-1,date_from.day,date_from.year)
     print url
     return genPricesBySymbol_helper(url)
@@ -43,7 +43,7 @@ def genPricesBySymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'
 def genPricesProvideSymbol(symbol,date_from=datetime.strptime('1989-01-01','%Y-%m-%d'),date_to=datetime.now().date()):
 
     #from 1989.01.01 - 2014.12.31
-    url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv'\
+    url = 'http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%s&e=%s&f=%s&g=d&a=%s&b=%s&c=%s&ignore=.csv' \
           %(symbol,date_to.month - 1, date_to.day,date_to.year,date_from.month-1,date_from.day,date_from.year)
     print url
     return genPricesBySymbol_helper(url)

@@ -49,7 +49,7 @@ class DB():
 
     def __init__(self,):
         self.cur=self.conn.cursor()
-   
+
     def execute(self,s):
         logging.debug(s)
         self.cur.execute(s)
@@ -68,24 +68,24 @@ class DB():
 
 
     def get_history(self,symbol,time):
-      self.execute(SELECT_HISTORY%(symbol,time))
-      return self.cur.fetchone()
+        self.execute(SELECT_HISTORY%(symbol,time))
+        return self.cur.fetchone()
 
     def get_next(self,symbol,time):
-      self.execute(SELECT_NEXT_N%(symbol,time,1))
-      return self.cur.fetchone()
+        self.execute(SELECT_NEXT_N%(symbol,time,1))
+        return self.cur.fetchone()
 
     def get_pre(self,symbol,time):
-      self.execute(SELECT_PRE_N%(symbol,time,1))
-      return self.cur.fetchone()
+        self.execute(SELECT_PRE_N%(symbol,time,1))
+        return self.cur.fetchone()
 
     def get_pre_many(self,symbol,time,n):
-      self.execute(SELECT_PRE_N%(symbol,time,n))
-      return self.cur.fetchall()
+        self.execute(SELECT_PRE_N%(symbol,time,n))
+        return self.cur.fetchall()
 
     def get_next_many(self,symbol,time,n):
-      self.execute(SELECT_NEXT_N%(symbol,time,n))
-      return self.cur.fetchall()
+        self.execute(SELECT_NEXT_N%(symbol,time,n))
+        return self.cur.fetchall()
 
     def get_latest_date(self,symbol,date=datetime.now().date()):
         self.execute(GET_LATEST_DATE_BEFORE%(symbol,date))
@@ -122,46 +122,46 @@ class DB():
         return True
 
     def update_history_from_file(self):
-      count = 0
-      with open(config.PRICE_FILE, "r") as f:
-        for line in f:
-          array = line.split()
-          exist_count = int(self.get_count(array[0],array[1])[0])
-          if exist_count > 0:
-              logging.error("duplicate line %s"%count)
-              logging.error(line)
-              continue
+        count = 0
+        with open(config.PRICE_FILE, "r") as f:
+            for line in f:
+                array = line.split()
+                exist_count = int(self.get_count(array[0],array[1])[0])
+                if exist_count > 0:
+                    logging.error("duplicate line %s"%count)
+                    logging.error(line)
+                    continue
 
-          logging.error(array)
-          self.insert_history(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7])
-          if count > 1000:
-            self.commit()
-            count = 0
-            logging.info('insert 1000')
-          else:
-            count = count + 1
+                logging.error(array)
+                self.insert_history(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7])
+                if count > 1000:
+                    self.commit()
+                    count = 0
+                    logging.info('insert 1000')
+                else:
+                    count = count + 1
 
-      self.commit()
+        self.commit()
 
     def update_history_index_from_file(self):
-      count = 0
-      with open(config.SHA_INDEX_FILE, "r") as f:
-        for line in f:
-          array = line.split(',')
-          exist_count = int(self.get_count('000000',array[0])[0])
-          if exist_count > 0:
-              logging.error("duplicate line %s"%count)
-              logging.error(line)
-              continue
-          self.insert_history('000000',array[0],array[1],array[2],array[3],array[4],array[5],array[6])
-          if count > 1000:
-            self.commit()
-            count = 0
-            logging.info('insert 1000')
-          else:
-            count = count + 1
+        count = 0
+        with open(config.SHA_INDEX_FILE, "r") as f:
+            for line in f:
+                array = line.split(',')
+                exist_count = int(self.get_count('000000',array[0])[0])
+                if exist_count > 0:
+                    logging.error("duplicate line %s"%count)
+                    logging.error(line)
+                    continue
+                self.insert_history('000000',array[0],array[1],array[2],array[3],array[4],array[5],array[6])
+                if count > 1000:
+                    self.commit()
+                    count = 0
+                    logging.info('insert 1000')
+                else:
+                    count = count + 1
 
-      self.commit()
+        self.commit()
 
     def update_history(self):
         #for console

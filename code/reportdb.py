@@ -59,7 +59,7 @@ class ReportDB():
 
     def __init__(self):
         self.cur = self.conn.cursor()
-   
+
     def execute(self,s):
         logging.debug(s)
         self.cur.execute(s)
@@ -144,23 +144,23 @@ class ReportDB():
             return True
 
     def insert_history_from_file(self):
-      with open(config.REPORT_FILE, "r") as f:
-        for line in f:
-          line = line.rstrip()
-          array = re.split(r'\t', line)
-          #[logging.error(i.decode('utf-8')) for i in array]
+        with open(config.REPORT_FILE, "r") as f:
+            for line in f:
+                line = line.rstrip()
+                array = re.split(r'\t', line)
+                #[logging.error(i.decode('utf-8')) for i in array]
 
-          if not self.filter(array):
-              continue
+                if not self.filter(array):
+                    continue
 
-          self.insert_history(array[1],array[0],
-                              array[2],array[3],
-                              array[4],
-                              array[5],array[6],
-                              array[7],array[8],
-                              array[9])
+                self.insert_history(array[1],array[0],
+                                    array[2],array[3],
+                                    array[4],
+                                    array[5],array[6],
+                                    array[7],array[8],
+                                    array[9])
 
-      self.commit()
+        self.commit()
 
     def update_history(self):
         latest_date= self.get_latest_date()

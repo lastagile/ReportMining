@@ -10,19 +10,19 @@ from xs.x import X
 
 class Generater():
     def __init__(self):
-      self.init_y(config.y)
-      self.init_x()
+        self.init_y(config.y)
+        self.init_x()
 
     def init_y(self, y):
-      exec('import ys.' + y.lower())
-      y = eval('ys.' + y.lower() + '.' + y + '()')
-      self.y = y
+        exec('import ys.' + y.lower())
+        y = eval('ys.' + y.lower() + '.' + y + '()')
+        self.y = y
 
     def init_x(self):
-      self.x = X()
+        self.x = X()
 
     def init_interval(self, interval):
-      self.y.set_interval(interval)
+        self.y.set_interval(interval)
 
     def run(self):
         logging.debug("run start...")
