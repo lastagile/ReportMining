@@ -2,6 +2,7 @@ import logging
 import config
 import re
 from reportdb import ReportDB
+from datetime import datetime,timedelta
 
 class X(object):  
   def __init__(self): 
@@ -9,11 +10,12 @@ class X(object):
     self.xobj_list = []
     self.init_x(config.x)
     self.db = ReportDB()
-    self.db.execute_get_all()
+    from_day = datetime.strptime(config.FROM_DAY,'%Y-%m-%d').date()
+    to_day = datetime.strptime(config.TO_DAY,'%Y-%m-%d').date()
+    self.db.execute_get_many_in_range(from_day,to_day,config.READ_FORWARD)
 
 
   def read_line(self):
-    if (config.read_forward == 'y'):
       while True:
         line = self.db.fetchone()
         if ( None == line ):
@@ -23,9 +25,6 @@ class X(object):
           a = self.format(line)
           if a:
               return a
-    else:
-      logging.error("need to be done revert reading")
-      return None
 
   def init_x(self, x_list):
     for x in x_list: 

@@ -38,10 +38,14 @@ DEFAULT CHARACTER SET = utf8;
 
 INSERT_HISTORY="INSERT INTO report (Symbol,Date,Name,Title,Industry,Broker,Reporter,Rank,Action,Space) VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"
 SELECT_HISTORY="SELECT * from report where Symbol='%s' and Date='%s'"
-SELECT_HISTORY_RANGE="SELECT * from report where Symbol='%s' and Date>='%s' and Date<='%s'"
+SELECT_HISTORY_RANGE="SELECT * from report where Symbol='%s' and Date>='%s' and Date<='%s' Order by Date"
+SELECT_ALL_HISTORY_RANGE="SELECT * from report where Date>='%s' and Date<='%s' Order by Date"
+SELECT_ALL_HISTORY_RANGE_DESC="SELECT * from report where Date>='%s' and Date<='%s' Order by Date DESC"
 HISTORY_COUNT="SELECT count(*) from report where Symbol='%s' and Date='%s' and Title='%s' and Reporter='%s'"
 SELECT_ALL_HISTORY="SELECT * from report Order by Date"
+SELECT_ALL_HISTORY_DESC="SELECT * from report Order by Date DESC"
 GET_LATEST_DATE="SELECT MAX(Date) from report"
+
 
 class ReportDB():
     conn = pymysql.connect(host=config.host,
@@ -63,8 +67,23 @@ class ReportDB():
     def fetchone(self):
         return self.cur.fetchone()
 
-    def execute_get_all(self):
-        self.execute(SELECT_ALL_HISTORY)
+    def execute_get_all(self,forward=True):
+        if forward:
+            self.execute(SELECT_ALL_HISTORY)
+        else:
+            self.execute(SELECT_ALL_HISTORY_DESC)
+
+    def execute_get_all(self,forward=True):
+        if forward:
+            self.execute(SELECT_ALL_HISTORY)
+        else:
+            self.execute(SELECT_ALL_HISTORY_DESC)
+
+    def execute_get_many_in_range(self,from_day,to_day,forward=True):
+        if forward:
+            self.execute(SELECT_ALL_HISTORY_RANGE%(from_day,to_day))
+        else:
+            self.execute(SELECT_ALL_HISTORY_RANGE_DESC%(from_day,to_day))
 
     def commit(self):
         self.conn.commit()
@@ -87,11 +106,11 @@ class ReportDB():
         self.execute(HISTORY_COUNT%(symbol,time,title,reporter))
         return self.cur.fetchone()
 
-    def get_one(self,symbol,time_from, time_to):
+    def get_one_in_range(self,symbol,time_from, time_to):
         self.execute(SELECT_HISTORY_RANGE%(symbol,time_from, time_to))
         return self.cur.fetchone()
 
-    def get_many(self,symbol,time_from, time_to):
+    def get_many_in_range(self,symbol,time_from, time_to):
         self.execute(SELECT_HISTORY_RANGE%(symbol,time_from, time_to))
         return self.cur.fetchall()
 

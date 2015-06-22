@@ -55,7 +55,7 @@ class XN(XBase):
     for days in self.days_list:
         pre_date = date - days
 
-        report_list_list = self.db.get_many(symbol,pre_date,date)
+        report_list_list = self.db.get_many_in_range(symbol,pre_date,date)
         #logging.error(report_list_list)
         # how many reports
         rlist.append(len(report_list_list))

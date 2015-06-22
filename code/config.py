@@ -19,17 +19,27 @@ else:
     REPORT_FILE="../data/report.0620.data.nodup"
     SYMBOL_List_FILE="../data/symbolList.1105.data"
 
+# report related
+if DEBUG:
+    FROM_DAY="2015-06-01"
+else:
+    FROM_DAY="2014-01-01"
+TO_DAY="2015-12-30"
 
+READ_FORWARD=True
+
+# crawl data related
 NET_WORK_RETRY_TIMES = 10
 TOLERATE_DAYS=30
 
 # algos
-read_forward="y"
-y="AlphaDayDiffY"
+#y="AlphaDayDiffY"
+y="DayDiffY"
 daydiffcriteria = [-25,-10,-5,-2,0,2,5,10,25]
 alphadaydiffcriteria = [-25,-10,-5,-2,0,2,5,10,25]
 #x=["X1","XPriceHistory","AlphaXPriceHistory"]
-x=["X1","AlphaXPriceHistory","XVolumeHistory","XN"]
+#x=["X1","AlphaXPriceHistory","XVolumeHistory","XN"]
+x=["X1","XPriceHistory","XVolumeHistory","XN"]
 #x=["XN"]
 days=7
 
